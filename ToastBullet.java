@@ -1,5 +1,7 @@
 package strategictoastinsertion;
 
+import org.newdawn.slick.geom.Rectangle;
+
 /*
 Creators: Matthew Godfrey, Seth Thomson, Jonah Monaghan
 Created: May 18th, 2016
@@ -55,7 +57,10 @@ public class ToastBullet extends STIObject{
         }
     }
     
-    
+    public Rectangle getShape(){
+        Rectangle bosch = new Rectangle(xPos, yPos, Play.bulletWidth, Play.bulletHeight);
+        return bosch;
+    }
     
     
     public String generateToast(){

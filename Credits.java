@@ -64,6 +64,7 @@ public class Credits extends BasicGameState {
                 Play.arrayMade = false;
                 Play.toasters = new ArrayList();
                 Play.player.playerName = "GADFREY";
+                Play.difficulty = 0;
                 start = true;
             }
         }else{ 
@@ -113,11 +114,12 @@ public class Credits extends BasicGameState {
         }catch(IOException e){
             System.out.println(e);
         }
+        scoreSearch = linearSearch(names, Play.player.playerName);
         Play.player.playerName+=": ";
         names.add(Play.player.playerName); 
         scores.add(Play.player.score);
         savesCounter++;
-        scoreSearch = linearSearch(names, Play.player.playerName);
+        
         if(scoreSearch == -1){
             prevScore = "No previous scores found";
         }else{

@@ -33,8 +33,9 @@ public class Play extends BasicGameState {
      * @author Matthew Godfrey & Jonah Monaghan
      * @version 1.20
      */
-    static Music themeSong, menuSong;
+    static Music themeSong, menuSong, creditsSong;
     static Image bg, playerIcon, dead, pew;
+    Shape box;
     Input input;
     static Bird player;
     static Animation bird;
@@ -43,21 +44,23 @@ public class Play extends BasicGameState {
     static DecimalFormat number;
     static ArrayList<ToastBullet> bullets = new ArrayList();
     boolean fired = false;
-    static int bulletHeight, bulletWidth;
+    static int bulletHeight = Menu.birdHeight / 2, bulletWidth = Menu.birdWidth / 2, difficulty = 0;
     TrueTypeFont ttf;
     static boolean isAlive = true;
     static ArrayList<ToasterBlock> toasters = new ArrayList();
-    static ArrayList<Shape> toastersCollision = new ArrayList();
     static ArrayList<Shape> bulletCollision = new ArrayList();
-    int shapeX, shapeY, rndY, rndGen, toasterGen, difficulty = 0;
-    int percentChance = 1;
+    static ArrayList<Shape> toastersCollision = new ArrayList();
+    int shapeX, shapeY, rndY, rndGen, toasterGen, percentChance = 1;
     static long deathTime = -1;
+    static long fireTime = -1;
     Shape birdRect;
+    ToastBullet projectile;
 
     @Override
     public void init(GameContainer gc, StateBasedGame sbg) throws SlickException {
         menuSong = new Music("res/audio/thiefInTheNight.wav");
         themeSong = new Music("res/audio/portent.wav");
+        creditsSong = new Music("res/audio/upbeatForever.wav");
         number = new DecimalFormat("###,###");
         Font font = new Font("Palatino Linotype", Font.BOLD, 26);
 
@@ -90,12 +93,12 @@ public class Play extends BasicGameState {
         } else {
             dead.draw(player.getxPos(), player.getyPos(), Menu.birdHeight, Menu.birdWidth);
         }
-        bulletHeight = Menu.birdHeight / 2;
-        bulletWidth = Menu.birdWidth / 2;
-        for (ToastBullet currentBullet : bullets ) {
+
+        for (ToastBullet currentBullet : bullets) {
             pew = new Image(currentBullet.getImageString());
-            Play.bulletCollision.add(new Rectangle(currentBullet.getxPos(), currentBullet.getyPos(), Play.bulletWidth, Play.bulletHeight));
-            pew.draw((currentBullet.getxPos()), (currentBullet.getyPos()), bulletHeight, bulletWidth);
+            box = currentBullet.getShape();
+            bulletCollision.add(box);
+            pew.draw(currentBullet.getxPos(), currentBullet.getyPos(), bulletHeight, bulletWidth);
         }
         for (ToasterBlock toaster : toasters) {
             toaster.toasterImg.draw(toaster.xPos, toaster.yPos, Menu.birdHeight, Menu.birdWidth);
@@ -111,10 +114,55 @@ public class Play extends BasicGameState {
                 sbg.enterState(SettingUp.credits);
             }
         }
-        rndGen = (int) (Math.random() * 99) + 1;
 
+        for (int j = 0; j < bullets.size(); j++) {
+            projectile = bullets.get(j);
+            box = bulletCollision.get(bullets.indexOf(projectile));
+            if (isAlive) {
+                projectile.move();
+                box.setLocation(projectile.getxPos(), projectile.getyPos());
+                if (projectile.getxPos() > Menu.width) {
+                    bullets.remove(projectile);
+                    bulletCollision.remove(box);
+                }
+            } else {
+                bullets.remove(projectile);
+                bulletCollision.remove(box);
+            }
+        }
+
+        for (int j = 0; j < toasters.size(); j++) {
+            ToasterBlock currentToaster = toasters.get(j);
+            Shape currentShape = toastersCollision.get(toasters.indexOf(currentToaster));
+            if (isAlive) {
+                currentToaster.move();
+                currentShape.setLocation(currentToaster.xPos, currentToaster.yPos);
+            }
+            if (currentToaster.xPos < 0 - (Menu.birdWidth * 2)) {
+                currentToaster.setHealth(currentToaster.getHealth() - 1);
+                System.out.println(currentToaster.getHealth());
+                if (currentToaster.getHealth() <= 0) {
+                    toasters.remove(currentToaster);
+                    toastersCollision.remove(currentShape);
+                }
+            }
+            if (birdRect.intersects(currentShape)) {
+                player.die();
+                deathTime = System.currentTimeMillis();
+            }
+            for (int k = 0; k < bullets.size(); k++) {
+                if (box.intersects(currentShape)) {
+                    toasters.remove(currentToaster);
+                    toastersCollision.remove(currentShape);
+                    bullets.remove(projectile);
+                    bulletCollision.remove(box);
+                }
+            }
+        }
+
+        rndGen = (int) (Math.random() * 99) + 1;
         if (rndGen <= percentChance) {
-            rndY = (((int) (Math.random() * 6)) * Menu.birdWidth) + 5;
+            rndY = (((int) (Math.random() * 6) + 0) * Menu.birdWidth) + 5;
             if (difficulty < 50) {
                 toasters.add(new ToasterBlock(Menu.width - 10, rndY, 1));
                 toastersCollision.add(new Rectangle(Menu.width - 10, rndY, Menu.birdWidth, Menu.birdHeight));
@@ -151,43 +199,6 @@ public class Play extends BasicGameState {
             percentChance++;
         }
 
-        for(int j = 0; j < bullets.size(); j++){
-            bullets.get(j).move();
-            if (bullets.get(j).getxPos() > Menu.width) {
-                bullets.remove(j);
-                bulletCollision.remove(j);
-            }
-            if (!isAlive) {
-                bullets.remove(j);
-                bulletCollision.remove(j);
-            }
-            
-        }
-        
-        for (int j = 0; j < toasters.size(); j++) {
-            ToasterBlock currentToaster = toasters.get(j);
-            Shape currentShape = toastersCollision.get(toasters.indexOf(currentToaster));
-            if (isAlive) {
-                currentToaster.move();
-                currentShape.setLocation(currentToaster.xPos, currentToaster.yPos);
-            }
-            if (currentToaster.xPos < 0 - (Menu.birdWidth * 2)) {
-                toasters.remove(currentToaster);
-                toastersCollision.remove(currentShape);
-            }
-            if (birdRect.intersects(currentShape)) {
-                player.die();
-                deathTime = System.currentTimeMillis();
-            }
-            for(Shape currentBullet : bulletCollision){
-                if(currentBullet.intersects(currentShape)){
-                    toasters.remove(currentToaster);
-                    toastersCollision.remove(currentShape);
-                    System.out.println("Toaster Destroyed");
-                }
-            }
-        }
-
         if (arrayMade == false) {
             setBirdArray();
         }
@@ -206,11 +217,15 @@ public class Play extends BasicGameState {
                 player.moveDown();
             }
         }
+
         if (input.isKeyDown(Input.KEY_SPACE)) {
             if (isAlive) {
                 bird.setCurrentFrame(1);
-                if (input.isKeyPressed(Input.KEY_SPACE)) {
-                    bullets.add(player.shoot());
+                if (Menu.currentTime > fireTime + 500) {
+                    if (input.isKeyPressed(Input.KEY_SPACE)) {
+                        bullets.add(player.shoot());
+                        fireTime = System.currentTimeMillis();
+                    }
                 }
             }
         } else {
