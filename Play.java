@@ -53,7 +53,7 @@ public class Play extends BasicGameState {
     int shapeX, shapeY, rndY, rndGen, toasterGen, percentChance = 1;
     static long deathTime = -1;
     static long fireTime = -1;
-    Shape birdRect;
+    Shape birdRect, skwair;
     ToastBullet projectile;
 
     @Override
@@ -96,8 +96,6 @@ public class Play extends BasicGameState {
 
         for (ToastBullet currentBullet : bullets) {
             pew = new Image(currentBullet.getImageString());
-            box = currentBullet.getShape();
-            bulletCollision.add(box);
             pew.draw(currentBullet.getxPos(), currentBullet.getyPos(), bulletHeight, bulletWidth);
         }
         for (ToasterBlock toaster : toasters) {
@@ -117,17 +115,17 @@ public class Play extends BasicGameState {
 
         for (int j = 0; j < bullets.size(); j++) {
             projectile = bullets.get(j);
-            box = bulletCollision.get(bullets.indexOf(projectile));
+            skwair = bulletCollision.get(bullets.indexOf(projectile));
             if (isAlive) {
                 projectile.move();
                 box.setLocation(projectile.getxPos(), projectile.getyPos());
                 if (projectile.getxPos() > Menu.width) {
                     bullets.remove(projectile);
-                    bulletCollision.remove(box);
+                    bulletCollision.remove(skwair);
                 }
             } else {
                 bullets.remove(projectile);
-                bulletCollision.remove(box);
+                bulletCollision.remove(skwair);
             }
         }
 
@@ -150,46 +148,52 @@ public class Play extends BasicGameState {
                 player.die();
                 deathTime = System.currentTimeMillis();
             }
-            for (int k = 0; k < bullets.size(); k++) {
-                if (box.intersects(currentShape)) {
-                    toasters.remove(currentToaster);
-                    toastersCollision.remove(currentShape);
-                    bullets.remove(projectile);
-                    bulletCollision.remove(box);
+            if (bullets.size() > 0) {
+                for (int k = bullets.size(); k >= 0; k--) {
+                    if (box.intersects(currentShape)) {
+                        currentToaster.damage();
+                        if (currentToaster.getHealth() + 1 <= 0) {
+                            Bird.score += currentToaster.getScoreToAdd();
+                            toasters.remove(currentToaster);
+                            toastersCollision.remove(currentShape);
+                        }
+                        bullets.remove(projectile);
+                        bulletCollision.remove(skwair);
+                    }
                 }
             }
         }
-
-        rndGen = (int) (Math.random() * 99) + 1;
-        if (rndGen <= percentChance) {
-            rndY = (((int) (Math.random() * 6) + 0) * Menu.birdWidth) + 5;
-            if (difficulty < 50) {
-                toasters.add(new ToasterBlock(Menu.width - 10, rndY, 1));
-                toastersCollision.add(new Rectangle(Menu.width - 10, rndY, Menu.birdWidth, Menu.birdHeight));
-                difficulty++;
-            } else if (difficulty > 50 && difficulty < 100) {
-                toasterGen = (int) (Math.random() * 2) + 1;
-                toasters.add(new ToasterBlock(Menu.width - 10, rndY, toasterGen));
-                toastersCollision.add(new Rectangle(Menu.width - 10, rndY, Menu.birdWidth, Menu.birdHeight));
-                difficulty++;
-            } else if (difficulty > 100 && difficulty < 150) {
-                toasterGen = (int) (Math.random() * 3) + 1;
-                toasters.add(new ToasterBlock(Menu.width - 10, rndY, toasterGen));
-                toastersCollision.add(new Rectangle(Menu.width - 10, rndY, Menu.birdWidth, Menu.birdHeight));
-                difficulty++;
-            } else if (difficulty > 150 && difficulty < 200) {
-                toasterGen = (int) (Math.random() * 2) + 2;
-                toasters.add(new ToasterBlock(Menu.width - 10, rndY, toasterGen));
-                toastersCollision.add(new Rectangle(Menu.width - 10, rndY, Menu.birdWidth, Menu.birdHeight));
-                difficulty++;
-            } else if (difficulty > 200) {
-                toasterGen = (int) (Math.random() * 1) + 3;
-                toasters.add(new ToasterBlock(Menu.width - 10, rndY, toasterGen));
-                toastersCollision.add(new Rectangle(Menu.width - 10, rndY, Menu.birdWidth, Menu.birdHeight));
-                difficulty++;
+        if (isAlive) {
+            rndGen = (int) (Math.random() * 99) + 1;
+            if (rndGen <= percentChance) {
+                rndY = (((int) (Math.random() * 6) + 0) * Menu.birdWidth) + 5;
+                if (difficulty < 50) {
+                    toasters.add(new ToasterBlock(Menu.width - 10, rndY, 1));
+                    toastersCollision.add(new Rectangle(Menu.width - 10, rndY, Menu.birdWidth, Menu.birdHeight));
+                    difficulty++;
+                } else if (difficulty > 50 && difficulty < 100) {
+                    toasterGen = (int) (Math.random() * 2) + 1;
+                    toasters.add(new ToasterBlock(Menu.width - 10, rndY, toasterGen));
+                    toastersCollision.add(new Rectangle(Menu.width - 10, rndY, Menu.birdWidth, Menu.birdHeight));
+                    difficulty++;
+                } else if (difficulty > 100 && difficulty < 150) {
+                    toasterGen = (int) (Math.random() * 3) + 1;
+                    toasters.add(new ToasterBlock(Menu.width - 10, rndY, toasterGen));
+                    toastersCollision.add(new Rectangle(Menu.width - 10, rndY, Menu.birdWidth, Menu.birdHeight));
+                    difficulty++;
+                } else if (difficulty > 150 && difficulty < 200) {
+                    toasterGen = (int) (Math.random() * 2) + 2;
+                    toasters.add(new ToasterBlock(Menu.width - 10, rndY, toasterGen));
+                    toastersCollision.add(new Rectangle(Menu.width - 10, rndY, Menu.birdWidth, Menu.birdHeight));
+                    difficulty++;
+                } else if (difficulty > 200) {
+                    toasterGen = (int) (Math.random() * 1) + 3;
+                    toasters.add(new ToasterBlock(Menu.width - 10, rndY, toasterGen));
+                    toastersCollision.add(new Rectangle(Menu.width - 10, rndY, Menu.birdWidth, Menu.birdHeight));
+                    difficulty++;
+                }
             }
         }
-
         if (difficulty % 50 == 0) {
             difficulty++;
             ToasterBlock.accelerate();
@@ -223,7 +227,10 @@ public class Play extends BasicGameState {
                 bird.setCurrentFrame(1);
                 if (Menu.currentTime > fireTime + 500) {
                     if (input.isKeyPressed(Input.KEY_SPACE)) {
-                        bullets.add(player.shoot());
+                        ToastBullet temp = player.shoot();
+                        bullets.add(temp);
+                        box = temp.getShape();
+                        bulletCollision.add(box);
                         fireTime = System.currentTimeMillis();
                     }
                 }

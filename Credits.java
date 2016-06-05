@@ -65,6 +65,7 @@ public class Credits extends BasicGameState {
                 Play.toasters = new ArrayList();
                 Play.player.playerName = "GADFREY";
                 Play.difficulty = 0;
+                Bird.score = 0;
                 start = true;
             }
         }else{ 

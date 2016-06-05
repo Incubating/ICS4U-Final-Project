@@ -10,7 +10,7 @@ import org.newdawn.slick.SlickException;
  */
 public class ToasterBlock extends STIObject {
 
-    int health;
+    int health, scoreToAdd;
     static int CURRENT_SPEED = 2, MAX_SPEED = 10;
     Image toasterImg;
     //constructors
@@ -19,10 +19,13 @@ public class ToasterBlock extends STIObject {
         health = h;
         if(h == 1){
             imageString = "res/images/copper.png";
+            scoreToAdd = 100;
         }else if(h == 2){
             imageString = "res/images/silver.png";
+            scoreToAdd = 200;
         }else if(h == 3){
             imageString = "res/images/gold.png";
+            scoreToAdd = 300;
         }
         
         toasterImg = new Image(imageString);
@@ -36,6 +39,22 @@ public class ToasterBlock extends STIObject {
         this.yPos = yPos;
     }
 //getters and setters for instance variables
+
+    public int getScoreToAdd() {
+        return scoreToAdd;
+    }
+
+    public void setScoreToAdd(int scoreToAdd) {
+        this.scoreToAdd = scoreToAdd;
+    }
+
+    public Image getToasterImg() {
+        return toasterImg;
+    }
+
+    public void setToasterImg(Image toasterImg) {
+        this.toasterImg = toasterImg;
+    }
 
     public int getHealth() {
         return health;
@@ -86,6 +105,9 @@ public class ToasterBlock extends STIObject {
     
     public void move(){
         xPos -= CURRENT_SPEED;
+    }
+    public void damage(){
+        health -= 1;
     }
  
     //movement speed changer
