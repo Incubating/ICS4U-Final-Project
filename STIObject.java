@@ -1,8 +1,7 @@
 /*
 Creators: Matthew Godfrey, Seth Thomson, Jonah Monaghan
 Created: May 18th, 2016
-Purpose: abstract class to handle objects for the game "Strategic Toast Insertion"
-Version: 1.2
+Purpose: the abstract class that handles all basic objects
  */
 package strategictoastinsertion;
 
@@ -11,70 +10,59 @@ package strategictoastinsertion;
  * @author Seth Thomson
  */
 public class STIObject {
-   int xPos, yPos, speed;
-    String type, imageString;
+   int xPos, yPos, speed;//integers to handle player movement
+    String  imageString;//strings to handle type
 
+    //Constructors
     public STIObject() {
+        //initialize variables
         xPos = 0;
         yPos = 0;
         speed = 1;
-        type = "res/images/oh noes.jpg";
         imageString = "res/images/oh noes.jpg";
     }
 
     public STIObject(int xPos, int yPos) {
-        this.xPos = xPos;
-        this.yPos = yPos;
+        this();//constructor call
+        this.xPos = xPos;//initialize xposition
+        this.yPos = yPos;//initialize yposition
     }
 
     public STIObject(int xPos, int yPos, int speed) {
-        this(xPos, yPos);
-        this.speed = speed;
-    }
-
-    public STIObject(int xPos, int yPos, int speed, String type) {
-        this(xPos, yPos, speed);
-        this.type = type;
+        this(xPos, yPos);//constructor call
+        this.speed = speed;//initialize speed
     }
     
-
-    public int getxPos() {
+    //getters and setters
+    public int getxPos() {//return xposition
         return xPos;
     }
 
-    public void setxPos(int xPos) {
+    public void setxPos(int xPos) {//set xposition
         this.xPos = xPos;
     }
 
-    public int getyPos() {
+    public int getyPos() {//return yposition
         return yPos;
     }
 
-    public void setyPos(int yPos) {
+    public void setyPos(int yPos) {//set yposition
         this.yPos = yPos;
     }
 
-    public int getSpeed() {
+    public int getSpeed() {//return speed
         return speed;
     }
 
-    public void setSpeed(int speed) {
+    public void setSpeed(int speed) {//set speed
         this.speed = speed;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getImageString() {
+    public String getImageString() {//return image string
         return imageString;
     }
 
-    public void setImageString(String imageString) {
+    public void setImageString(String imageString) {//set image string
         this.imageString = imageString;
     }
     

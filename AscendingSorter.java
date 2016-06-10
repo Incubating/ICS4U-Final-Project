@@ -4,9 +4,9 @@ import java.util.ArrayList;
 
 /**
  *
- * @author Jonah Monaghan
- * @version 2.0 (12/5/16)
- * Sorts ArrayList from lowest to highest
+ * Creators: Matthew Godfrey, Seth Thomson, Jonah Monaghan
+ Created: May 18th, 2016
+ Purpose: the class that handles score sorting
  */
 public class AscendingSorter{
    
